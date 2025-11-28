@@ -79,7 +79,19 @@ namespace sokoban
                 switch (input)
                 {
                     case ConsoleKey.DownArrow:
-                        playerY = Math.Max(playerY++, -1);
+                        if (wallBase[playerY + 1][playerX] != 1)
+                        {
+                            if (wallBase[playerY + 1][playerX] == 2)
+                            {
+                                Console.SetCursorPosition(playerY+2, playerX);
+                                playerY++;
+                            }else
+                            {
+                                playerY++;
+
+                            }
+
+                        }
                         break;
                     case ConsoleKey.UpArrow:
                         if (wallBase[playerY-1][playerX] != 1)
