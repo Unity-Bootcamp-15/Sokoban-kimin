@@ -5,7 +5,6 @@
         static void Main(string[] args)
         {
             // 게임 초기화 
-
             Console.ResetColor();
             // 색깔 조정
             Console.BackgroundColor = ConsoleColor.DarkCyan;
