@@ -21,21 +21,45 @@ namespace sokoban
             int playerY = 2;
 
             string player = "■";
-            string wall = "□";
+            string wallSpace = " ";
+            string WallString = "□";
+
+            int maxWallX = 18;
+            int maxWallY = 10;
+            int[][] wallBase = { 
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            };
+            int wallX = 0;
+            int wallY = 0;
+
             while (true)
             {
                 PlayerMove();
             }
+
             void makeWall()
             {
-                for (int i = 0; i < 10; i++) 
+                for (int x = 0; x < maxWallX; x++)
                 {
-                    for (int j = 0; j < 10; j++)
+                    for (int y = 0; y < maxWallY; y++)
                     {
-                        Console.Write(wall);
+                        Console.SetCursorPosition(x, y);
+
+                        if (wallBase[y][x] == 0)
+                            Console.Write(wallSpace);
+                        Console.Write(WallString);
                     }
-                    Console.WriteLine();
                 }
+             
             }
 
             void PlayerMove()
@@ -47,24 +71,23 @@ namespace sokoban
                 Console.SetCursorPosition(playerX, playerY);
                 Console.Write(player);
 
-
                 ConsoleKey input = Console.ReadKey().Key;
                 switch (input)
                 {
                     case ConsoleKey.DownArrow:
-                        if (playerY < 9)
+                        if (wallBase[playerY+1][playerX] != 1)
                             playerY++;
                         break;
                     case ConsoleKey.UpArrow:
-                        if (playerY != 0)
+                        if (wallBase[playerY-1][playerX] != 1)
                             playerY--;
                         break;
                     case ConsoleKey.RightArrow:
-                        if (playerX < 18)
+                        if (wallBase[playerY][playerX+2] != 1)
                             playerX +=2;
                         break;
                     case ConsoleKey.LeftArrow:
-                        if (playerX != 0)
+                        if (wallBase[playerY][playerX-2] != 1)
                             playerX -=2;
                         break;
                 }
