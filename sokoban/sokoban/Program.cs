@@ -14,9 +14,35 @@
             // 커서 숨김
             Console.CursorVisible = false;
             Console.WriteLine(Console.ReadLine());
-            Console.Clear(); 
+            Console.Clear();
 
 
+            int playerX = 0;
+            int playerY = 0;
+            string player = "A";
+
+            while (true)
+            {
+                Console.Clear();
+                Console.SetCursorPosition(playerX, playerY);
+                Console.Write(player);
+                ConsoleKey input = Console.ReadKey().Key;
+                switch (input)
+                {
+                    case ConsoleKey.DownArrow:
+                        playerY++;
+                        break;
+                    case ConsoleKey.UpArrow:
+                        playerY--;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        playerX++;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        playerX++;
+                        break;
+                }
+            }
         }
     }
 }
