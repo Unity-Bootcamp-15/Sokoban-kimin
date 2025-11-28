@@ -19,6 +19,8 @@ namespace sokoban
             int playerX = 0;
             int playerY = 0;
             string player = "A";
+            Console.WriteLine(Console.ReadLine());
+            Console.Clear();
 
             while (true)
             {
@@ -42,6 +44,30 @@ namespace sokoban
                         break;
                 }
             }
+
+            while (true)
+            {
+                Console.Clear();
+                Console.SetCursorPosition(playerX, playerY);
+                Console.Write(player);
+                ConsoleKey input = Console.ReadKey().Key;
+                switch (input)
+                {
+                    case ConsoleKey.DownArrow:
+                        playerY++;
+                        break;
+                    case ConsoleKey.UpArrow:
+                        playerY--;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        playerX++;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        playerX++;
+                        break;
+                }
+            }
+
         }
     }
 }
