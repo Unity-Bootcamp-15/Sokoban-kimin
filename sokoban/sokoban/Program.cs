@@ -4,6 +4,7 @@ namespace sokoban
 {
     internal class Program
     {
+      
         static void Main(string[] args)
         {
             // 게임 초기화 
@@ -15,41 +16,58 @@ namespace sokoban
             Console.Title = "My Sokoban,";
             // 커서 숨김
             Console.CursorVisible = false;
-            Console.WriteLine(Console.ReadLine());
-            Console.Clear();
 
+            int playerX = 2;
+            int playerY = 2;
 
-            int playerX = 0;
-            int playerY = 0;
-            string player = "A";
-
+            string player = "■";
+            string wall = "□";
             while (true)
             {
-                PlayerMove(playerX, playerY, player);
+                PlayerMove();
             }
-        }
-
-        static void PlayerMove(int playerX, int playerY , string player)
-        {
-            Console.Clear();
-            Console.SetCursorPosition(playerX, playerY);
-            Console.Write(player);
-            ConsoleKey input = Console.ReadKey().Key;
-            switch (input)
+            void makeWall()
             {
-                case ConsoleKey.DownArrow:
-                    playerY++;
-                    break;
-                case ConsoleKey.UpArrow:
-                    playerY--;
-                    break;
-                case ConsoleKey.RightArrow:
-                    playerX++;
-                    break;
-                case ConsoleKey.LeftArrow:
-                    playerX++;
-                    break;
+                for (int i = 0; i < 10; i++) 
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Console.Write(wall);
+                    }
+                    Console.WriteLine();
+                }
             }
+
+            void PlayerMove()
+            {
+                Console.Clear();
+
+                makeWall();
+
+                Console.SetCursorPosition(playerX, playerY);
+                Console.Write(player);
+
+
+                ConsoleKey input = Console.ReadKey().Key;
+                switch (input)
+                {
+                    case ConsoleKey.DownArrow:
+
+                        playerY++;
+                        break;
+                    case ConsoleKey.UpArrow:
+                        playerY--;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        playerX+=2;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        playerX-=2;
+                        break;
+                }
+            }
+
+
         }
     }
 }
