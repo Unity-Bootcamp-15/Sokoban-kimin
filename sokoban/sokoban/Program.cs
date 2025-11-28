@@ -24,6 +24,7 @@ namespace sokoban
             string wallSpace = " ";
             string WallString = "□";
 
+            string movingBox = "☆";
             int maxWallX = 18;
             int maxWallY = 10;
             int[][] wallBase = { 
@@ -31,15 +32,15 @@ namespace sokoban
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             };
-            int wallX = 0;
-            int wallY = 0;
+
+       
 
             while (true)
             {
@@ -56,7 +57,10 @@ namespace sokoban
 
                         if (wallBase[y][x] == 0)
                             Console.Write(wallSpace);
-                        Console.Write(WallString);
+                        else if(wallBase[y][x] == 2)
+                            Console.Write(movingBox);
+
+                            Console.Write(WallString);
                     }
                 }
              
@@ -75,8 +79,7 @@ namespace sokoban
                 switch (input)
                 {
                     case ConsoleKey.DownArrow:
-                        if (wallBase[playerY+1][playerX] != 1)
-                            playerY++;
+                        playerY = Math.Max(playerY++, -1);
                         break;
                     case ConsoleKey.UpArrow:
                         if (wallBase[playerY-1][playerX] != 1)
