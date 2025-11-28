@@ -1,4 +1,6 @@
-﻿namespace sokoban
+﻿using System.Numerics;
+
+namespace sokoban
 {
     internal class Program
     {
@@ -23,25 +25,30 @@
 
             while (true)
             {
-                Console.Clear();
-                Console.SetCursorPosition(playerX, playerY);
-                Console.Write(player);
-                ConsoleKey input = Console.ReadKey().Key;
-                switch (input)
-                {
-                    case ConsoleKey.DownArrow:
-                        playerY++;
-                        break;
-                    case ConsoleKey.UpArrow:
-                        playerY--;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        playerX++;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        playerX++;
-                        break;
-                }
+                PlayerMove(playerX, playerY, player);
+            }
+        }
+
+        static void PlayerMove(int playerX, int playerY , string player)
+        {
+            Console.Clear();
+            Console.SetCursorPosition(playerX, playerY);
+            Console.Write(player);
+            ConsoleKey input = Console.ReadKey().Key;
+            switch (input)
+            {
+                case ConsoleKey.DownArrow:
+                    playerY++;
+                    break;
+                case ConsoleKey.UpArrow:
+                    playerY--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    playerX++;
+                    break;
+                case ConsoleKey.LeftArrow:
+                    playerX++;
+                    break;
             }
         }
     }
