@@ -52,17 +52,20 @@ namespace sokoban
                 switch (input)
                 {
                     case ConsoleKey.DownArrow:
-
-                        playerY++;
+                        if (playerY < 9)
+                            playerY++;
                         break;
                     case ConsoleKey.UpArrow:
-                        playerY--;
+                        if (playerY != 0)
+                            playerY--;
                         break;
                     case ConsoleKey.RightArrow:
-                        playerX+=2;
+                        if (playerX < 18)
+                            playerX +=2;
                         break;
                     case ConsoleKey.LeftArrow:
-                        playerX-=2;
+                        if (playerX != 0)
+                            playerX -=2;
                         break;
                 }
             }
