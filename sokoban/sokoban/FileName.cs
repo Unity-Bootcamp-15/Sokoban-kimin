@@ -1,227 +1,221 @@
 ﻿using System;
+using System.Runtime.Intrinsics.X86;
 
-// 1. 맵 요소를 정의하는 열거형 (Enum)
-public enum ObjectType
-{
-    WALL = '#',       // 벽
-    SPACE = ' ',      // 빈 공간 (바닥)
-    PLAYER = 'P',     // 플레이어
-    BOX = 'B',        // 박스
-    GOAL = 'G',       // 목표 지점
-    BOX_ON_GOAL = 'O',// 목표 지점에 있는 박스
-    PLAYER_ON_GOAL = 'A' // 목표 지점에 있는 플레이어 (편의상 A로 정의)
-}
 
-public class SokobanGame
-{
-    // 게임 맵 (다차원 배열)
-    private char[,] map;
-
-    // 플레이어 위치
-    private int playerY;
-    private int playerX;
-
-    // 맵 정의
-    private string[] initialMap = new string[]
-    {
-        "##########",
-        "#P       #",
-        "#   # ## #",
-        "# G  BG  #",
-        "# #B######",
-        "# GB    G#",
-        "#        #",
-        "##########"
-    };
-
-    // 생성자: 맵 초기화 및 플레이어 위치 찾기
-    public SokobanGame()
-    {
-        int height = initialMap.Length;
-        int width = initialMap[0].Length;
-        map = new char[height, width];
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                map[y, x] = initialMap[y][x];
-                if (map[y, x] == (char)ObjectType.PLAYER)
-                {
-                    playerY = y;
-                    playerX = x;
-                    // 플레이어 초기 위치는 빈 공간으로 간주 (렌더링 시점에 P를 덮어씀)
-                    map[y, x] = (char)ObjectType.SPACE;
-                }
-            }
-        }
-    }
-
-    // 맵을 콘솔에 출력
-    public void Draw()
-    {
-        // 화면을 깨끗하게 지우고 새로 그립니다.
-        Console.Clear();
-
-        int height = map.GetLength(0);
-        int width = map.GetLength(1);
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                char cell = map[y, x];
-
-                // 플레이어 위치에 도달하면 실제 플레이어 기호('P' 또는 'A')를 출력
-                if (y == playerY && x == playerX)
-                {
-                    // 만약 플레이어가 목표 지점에 있다면 ObjectType.PLAYER_ON_GOAL 출력
-                    if (map[y, x] == (char)ObjectType.GOAL)
-                    {
-                        Console.Write((char)ObjectType.PLAYER_ON_GOAL);
-                    }
-                    else
-                    {
-                        Console.Write((char)ObjectType.PLAYER);
-                    }
-                }
-                else
-                {
-                    Console.Write(cell);
-                }
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("\nWASD로 이동, R키로 재시작");
-    }
-
-    // 게임 업데이트 (이동 처리)
-    public void Update(ConsoleKey key)
-    {
-        int nextY = playerY;
-        int nextX = playerX;
-        int pushY = playerY; // 박스를 밀었을 때 박스가 이동할 위치 Y
-        int pushX = playerX; // 박스를 밀었을 때 박스가 이동할 위치 X
-
-        // 이동 방향 설정
-        switch (key)
-        {
-            case ConsoleKey.W:
-                nextY--;
-                pushY -= 2;
-                break;
-            case ConsoleKey.S:
-                nextY++;
-                pushY += 2;
-                break;
-            case ConsoleKey.A:
-                nextX--;
-                pushX -= 2;
-                break;
-            case ConsoleKey.D:
-                nextX++;
-                pushX += 2;
-                break;
-            default:
-                return; // 다른 키는 무시
-        }
-
-        char nextCell = map[nextY, nextX];
-
-        // 1. 벽인지 확인
-        if (nextCell == (char)ObjectType.WALL)
-        {
-            return; // 이동 불가
-        }
-
-        // 2. 박스인지 확인 (BOX 또는 BOX_ON_GOAL)
-        if (nextCell == (char)ObjectType.BOX || nextCell == (char)ObjectType.BOX_ON_GOAL)
-        {
-            char pushCell = map[pushY, pushX];
-
-            // 박스 다음 칸이 벽이거나 (다른) 박스이면 밀기 불가
-            if (pushCell == (char)ObjectType.WALL ||
-                pushCell == (char)ObjectType.BOX ||
-                pushCell == (char)ObjectType.BOX_ON_GOAL)
-            {
-                return;
-            }
-
-            // 박스 이동 처리 (박스를 빈 공간 또는 목표 지점으로 옮김)
-            if (pushCell == (char)ObjectType.SPACE)
-            {
-                map[pushY, pushX] = (char)ObjectType.BOX;
-            }
-            else if (pushCell == (char)ObjectType.GOAL)
-            {
-                map[pushY, pushX] = (char)ObjectType.BOX_ON_GOAL;
-            }
-
-            // 플레이어가 박스를 밀고 이동할 때 박스가 있던 자리 정리
-            // 박스가 목표 지점에 있었다면 목표 지점('G')으로 되돌림
-            if (nextCell == (char)ObjectType.BOX_ON_GOAL)
-            {
-                map[nextY, nextX] = (char)ObjectType.GOAL;
-            }
-            // 박스가 일반 바닥에 있었다면 빈 공간(' ')으로 되돌림
-            else
-            {
-                map[nextY, nextX] = (char)ObjectType.SPACE;
-            }
-        }
-
-        // 3. 플레이어 이동 처리
-        playerY = nextY;
-        playerX = nextX;
-
-        // 승리 조건 체크
-        if (CheckWinCondition())
-        {
-            Draw();
-            Console.WriteLine("\n🎉 축하합니다! 모든 박스를 목표 지점에 옮겼습니다! 🎉");
-            Environment.Exit(0);
-        }
-    }
-
-    // 승리 조건 확인: 맵에 'B' (일반 박스)가 하나도 없어야 함
-    public bool CheckWinCondition()
-    {
-        foreach (char cell in map)
-        {
-            if (cell == (char)ObjectType.BOX)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-}
 
 public class Program
 {
-    public static void Main()
-    {
-        Console.Title = "C# 콘솔 소코반";
-        SokobanGame game = new SokobanGame();
+    static public int BoxCnt = 0;
+    static public int GameCnt = 0;
+    static public int mapMaxX = 18;
+    static public int mapMaxY = 10;
 
-        // 게임 루프
+    // 맵 
+    static public int[][] wallBase = {
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1],
+            [1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,1],
+            [1,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,3,0,0,0,0,0,0,0,0,6,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            };
+    static int BoxCount()
+    {
+       
+
+        BoxCnt = 0;
+        for (int x = 0; x < mapMaxX; x++)
+        {
+            for (int y = 0; y < mapMaxY; y++)
+            {
+                if (wallBase[y][x] == 2)
+                {
+                    BoxCnt++;
+                }
+            }
+        }
+
+        return BoxCnt;
+    }
+    public static void main()
+    {
+        // 게임 초기화 
+        Console.ResetColor();
+        // 색깔 조정
+        Console.BackgroundColor = ConsoleColor.DarkCyan;
+        Console.ForegroundColor = ConsoleColor.Green;
+        // 제목 수정
+        Console.Title = "My Sokoban,";
+        // 커서 숨김
+        Console.CursorVisible = false;
+
+      
+        int mapMinX = 1;
+        int mapMinY = 1;
+
+        string player = "P";
+        string wallSpace = " ";
+        string WallString = "W";
+        string movingBox = "b";
+        string BoxOnGoal = "B";
+        string finishBox = "F";
+        string potal1 = "O";
+        string potal2 = "0";
+
+
+        
+
+        int playerX = 5;
+        int playerY = 5;
+
+        GameCnt = BoxCount();
+
         while (true)
         {
-            game.Draw();
+            Console.SetCursorPosition(20, 1);
+            Console.WriteLine($"{GameCnt}개 남음");
 
-            // 사용자 입력 대기
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            ConsoleKey key = keyInfo.Key;
+            int newPlayerX = playerX;
+            int newPlayerY = playerY;
 
-            // R키로 재시작 (새 게임 객체 생성)
-            if (key == ConsoleKey.R)
+
+            makeWall();
+            // 키보드 입력
+            Console.SetCursorPosition(playerX, playerY);
+            Console.Write(player);
+
+            
+            ConsoleKey keyInfo = Console.ReadKey().Key;
+
+            
+
+            switch (keyInfo) 
             {
-                game = new SokobanGame();
-                continue;
+                case ConsoleKey.UpArrow:
+                    newPlayerY = Math.Max(mapMinY, newPlayerY -1);
+                    break;
+                case ConsoleKey.DownArrow:
+                    newPlayerY = Math.Min(mapMaxY -2, newPlayerY + 1);
+                    break;
+                case ConsoleKey.RightArrow:
+                    newPlayerX = Math.Min(mapMaxX -2, newPlayerX + 1);
+                    break;
+                case ConsoleKey.LeftArrow:
+                    newPlayerX = Math.Max(mapMinX, newPlayerX - 1);
+                    break;
+            }
+            
+
+            // 박스와 닿았나  // 어디 방향으로 밀지 
+            bool isBoxOn = wallBase[newPlayerY][newPlayerX] == 2;
+            int newBoxX = newPlayerX;
+            int newBoxY = newPlayerY;
+
+            
+
+            if (isBoxOn)
+            {
+                switch (keyInfo)
+                { 
+                    case ConsoleKey.UpArrow:
+                        newBoxY = Math.Max(mapMinY, newBoxY - 1);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        newBoxY = Math.Min(mapMaxY, newBoxY + 1);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        newBoxX = Math.Max(mapMinX, newBoxX + 1);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        newBoxX = Math.Min(mapMaxX, newBoxX - 1);
+                        break;
+                }
+
+                bool isWallBoxOn = wallBase[newBoxY][newBoxX] == 1;
+                bool isBoxBoxOn = wallBase[newBoxY][newBoxX] == 2;
+                bool isBoxFinishOn = wallBase[newBoxY][newBoxX] == 3;
+
+
+                if (isWallBoxOn|| isBoxBoxOn)
+                    continue;
+
+               
+
+                wallBase[newPlayerY][newPlayerX] = 0;
+                wallBase[newBoxY][newBoxX] = 2;
+
+                if (isBoxFinishOn)
+                {
+                    wallBase[newBoxY][newBoxX] = 4;
+
+                    GameCnt--;
+                    
+                    if (GameCnt == 0)
+                        break;
+                }
+
             }
 
-            // WASD 키로 게임 업데이트
-            game.Update(key);
+            
+
+            // 벽과 닿았나
+            bool isWallOn = wallBase[newPlayerY][newPlayerX] == 1;
+            if (isWallOn)
+                continue;
+
+            // 포탈 5번과 닿았나
+            bool isPotal = wallBase[newPlayerY][newPlayerX] == 5;
+            bool isPotal2 = wallBase[newPlayerY][newPlayerX] == 6;
+
+            if (isPotal)
+            {
+                newPlayerX = 15;
+                newPlayerY = 7;
+            }else if (isPotal2)
+            {
+                newPlayerX = 2;
+                newPlayerY = 2;
+            }
+            playerX = newPlayerX;
+            playerY = newPlayerY;
+
+          
         }
+
+        // Box 수세기
+        
+        void makeWall()
+        {
+            for (int x = 0; x < mapMaxX; x++)
+            {
+                for (int y = 0; y < mapMaxY; y++)
+                {
+                    Console.SetCursorPosition(x, y);
+
+                    if (wallBase[y][x] == 0)
+                        Console.Write(wallSpace);
+                    else if (wallBase[y][x] == 3)
+                        Console.Write(finishBox);
+                    else if(wallBase[y][x] == 1)
+                        Console.Write(WallString);
+                    else if (wallBase[y][x] == 2)
+                        Console.Write(movingBox);
+                    else if (wallBase[y][x] == 4)
+                        Console.Write(BoxOnGoal);
+                    else if (wallBase[y][x] == 5)
+                        Console.Write(potal1);
+                    else if (wallBase[y][x] == 6)
+                        Console.Write(potal2);
+                }
+            }
+        }
+
+
+
+
     }
 }
