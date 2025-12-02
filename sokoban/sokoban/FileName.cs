@@ -10,6 +10,14 @@ public class Program
     static public int mapMaxX = 18;
     static public int mapMaxY = 10;
 
+    static public string player = "P";
+    static public string wallSpace = " ";
+    static public string WallString = "W";
+    static public string movingBox = "b";
+    static public string BoxOnGoal = "B";
+    static public string finishBox = "F";
+    static public string potal1 = "O";
+    static public string potal2 = "0";
     // 맵 
     static public int[][] wallBase = {
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -41,6 +49,33 @@ public class Program
 
         return BoxCnt;
     }
+    // Box 수세기
+
+   public static void makeWall()
+    {
+        for (int x = 0; x < mapMaxX; x++)
+        {
+            for (int y = 0; y < mapMaxY; y++)
+            {
+                Console.SetCursorPosition(x, y);
+
+                if (wallBase[y][x] == 0)
+                    Console.Write(wallSpace);
+                else if (wallBase[y][x] == 3)
+                    Console.Write(finishBox);
+                else if (wallBase[y][x] == 1)
+                    Console.Write(WallString);
+                else if (wallBase[y][x] == 2)
+                    Console.Write(movingBox);
+                else if (wallBase[y][x] == 4)
+                    Console.Write(BoxOnGoal);
+                else if (wallBase[y][x] == 5)
+                    Console.Write(potal1);
+                else if (wallBase[y][x] == 6)
+                    Console.Write(potal2);
+            }
+        }
+    }
     public static void main()
     {
         // 게임 초기화 
@@ -57,17 +92,11 @@ public class Program
         int mapMinX = 1;
         int mapMinY = 1;
 
-        string player = "P";
-        string wallSpace = " ";
-        string WallString = "W";
-        string movingBox = "b";
-        string BoxOnGoal = "B";
-        string finishBox = "F";
-        string potal1 = "O";
-        string potal2 = "0";
-
-
         
+
+        int clearNumX = 20;
+        int clearNumY = 1;
+
 
         int playerX = 5;
         int playerY = 5;
@@ -76,7 +105,7 @@ public class Program
 
         while (true)
         {
-            Console.SetCursorPosition(20, 1);
+            Console.SetCursorPosition(clearNumY, clearNumX);
             Console.WriteLine($"{GameCnt}개 남음");
 
             int newPlayerX = playerX;
@@ -159,7 +188,6 @@ public class Program
                 }
 
             }
-
             
 
             // 벽과 닿았나
@@ -186,33 +214,7 @@ public class Program
           
         }
 
-        // Box 수세기
         
-        void makeWall()
-        {
-            for (int x = 0; x < mapMaxX; x++)
-            {
-                for (int y = 0; y < mapMaxY; y++)
-                {
-                    Console.SetCursorPosition(x, y);
-
-                    if (wallBase[y][x] == 0)
-                        Console.Write(wallSpace);
-                    else if (wallBase[y][x] == 3)
-                        Console.Write(finishBox);
-                    else if(wallBase[y][x] == 1)
-                        Console.Write(WallString);
-                    else if (wallBase[y][x] == 2)
-                        Console.Write(movingBox);
-                    else if (wallBase[y][x] == 4)
-                        Console.Write(BoxOnGoal);
-                    else if (wallBase[y][x] == 5)
-                        Console.Write(potal1);
-                    else if (wallBase[y][x] == 6)
-                        Console.Write(potal2);
-                }
-            }
-        }
 
 
 
