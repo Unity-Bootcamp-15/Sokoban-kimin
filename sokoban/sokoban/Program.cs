@@ -202,7 +202,8 @@ namespace sokoban
 
                     if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
                        (wallBase[playerY - 2][playerX] == (int)ObjectType.STAR ||
-                        wallBase[playerY - 2][playerX] == (int)ObjectType.WALL)
+                        wallBase[playerY - 2][playerX] == (int)ObjectType.WALL ||
+                        wallBase[playerY - 2][playerX] == (int)ObjectType.LOOKSTAR)
                         )
                     {
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
@@ -253,7 +254,8 @@ namespace sokoban
                     }
                     if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
                        (wallBase[playerY + 2][playerX] == (int)ObjectType.STAR ||
-                        wallBase[playerY + 2][playerX] == (int)ObjectType.WALL)
+                        wallBase[playerY + 2][playerX] == (int)ObjectType.WALL ||
+                        wallBase[playerY + 2][playerX] == (int)ObjectType.LOOKSTAR)
                         )
                     {
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
@@ -294,7 +296,8 @@ namespace sokoban
                     }
                     if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
                        (wallBase[playerY][playerX + 2] == (int)ObjectType.STAR ||
-                        wallBase[playerY][playerX + 2] == (int)ObjectType.WALL)
+                        wallBase[playerY][playerX + 2] == (int)ObjectType.WALL ||
+                        wallBase[playerY][playerX + 2] == (int)ObjectType.LOOKSTAR)
                         )
                     {
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
@@ -334,7 +337,8 @@ namespace sokoban
                     }
                     if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
                        (wallBase[playerY][playerX - 2] == (int)ObjectType.STAR ||
-                        wallBase[playerY][playerX - 2] == (int)ObjectType.WALL)
+                        wallBase[playerY][playerX - 2] == (int)ObjectType.WALL ||
+                        wallBase[playerY][playerX - 2] == (int)ObjectType.LOOKSTAR)
                         )
                     {
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
