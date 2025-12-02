@@ -27,6 +27,7 @@ namespace sokoban
 
         int newPlayerX = playerX;
         int newPlayerY = playerY;
+
         // 맵 
         int[][] wallBase = {
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -35,11 +36,13 @@ namespace sokoban
             [1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,2,0,1,0,1,0,0,0,0,0,0,1],
             [1,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,1],
             [1,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
             [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             };
+        
+        
         public enum ObjectType
         {
             SPACE = 0,
@@ -179,15 +182,24 @@ namespace sokoban
             switch (pmc)
             {
                 case PlayerMoveNum.UP:
+
+                    // 골대에 들어갔다면 
                     if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
                        wallBase[playerY - 2][playerX] == (int)ObjectType.FINISH)
                     {
                         wallBase[playerY - 1][playerX] = (int)ObjectType.SPACE;
                         wallBase[playerY - 2][playerX] = (int)ObjectType.LOOKSTAR;
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-
-
                     }
+                    // 골대에서 나온다면 
+                    if (wallBase[playerY - 1][playerX] == (int)ObjectType.LOOKSTAR &&
+                        wallBase[playerY-2][playerX] != (int)ObjectType.WALL)
+                    {
+                        wallBase[playerY - 1][playerX] = (int)ObjectType.FINISH;
+                        wallBase[playerY - 2][playerX] = (int)ObjectType.STAR;
+                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+                    }
+
                     if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
                        (wallBase[playerY - 2][playerX] == (int)ObjectType.STAR ||
                         wallBase[playerY - 2][playerX] == (int)ObjectType.WALL)
@@ -220,6 +232,15 @@ namespace sokoban
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
 
                         break;
+                    }
+
+                    // 골대에서 나온다면 
+                    if (wallBase[playerY + 1][playerX] == (int)ObjectType.LOOKSTAR &&
+                        wallBase[playerY+2][playerX] != (int)ObjectType.WALL)
+                    {
+                        wallBase[playerY + 1][playerX] = (int)ObjectType.FINISH;
+                        wallBase[playerY + 2][playerX] = (int)ObjectType.STAR;
+                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
                     }
                     if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
                        wallBase[playerY + 2][playerX] == (int)ObjectType.FINISH)
@@ -262,6 +283,15 @@ namespace sokoban
 
                         break;
                     }
+
+                    // 골대에서 나온다면 
+                    if (wallBase[playerY][playerX+1] == (int)ObjectType.LOOKSTAR &&
+                        wallBase[playerY][playerX + 2] != (int)ObjectType.WALL)
+                    {
+                        wallBase[playerY][playerX+1] = (int)ObjectType.FINISH;
+                        wallBase[playerY][playerX+2] = (int)ObjectType.STAR;
+                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
+                    }
                     if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
                        (wallBase[playerY][playerX + 2] == (int)ObjectType.STAR ||
                         wallBase[playerY][playerX + 2] == (int)ObjectType.WALL)
@@ -292,6 +322,15 @@ namespace sokoban
                         PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
 
                         break;
+                    }
+
+                    // 골대에서 나온다면 
+                    if (wallBase[playerY][playerX - 1] == (int)ObjectType.LOOKSTAR&&
+                        wallBase[playerY][playerX - 2] != (int)ObjectType.WALL)
+                    {
+                        wallBase[playerY][playerX - 1] = (int)ObjectType.FINISH;
+                        wallBase[playerY][playerX - 2] = (int)ObjectType.STAR;
+                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
                     }
                     if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
                        (wallBase[playerY][playerX - 2] == (int)ObjectType.STAR ||
@@ -357,6 +396,7 @@ namespace sokoban
             }
         }
 
+        
     }
     internal class Program
     {
