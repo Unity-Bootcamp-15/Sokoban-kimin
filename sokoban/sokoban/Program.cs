@@ -96,46 +96,64 @@ namespace sokoban
             }
 
         }
-
-
         // 박스 골 박스 정적으로 만들기 
         bool Finish(int x, int y)
         {
-
             if (wallBase[y][x] == (int)ObjectType.WALL)
             {
                 return true;
             }
-
             return false;
         }
-        // 벽만들기 
+        // 벽만들기
+
+        /*   void makeWall()
+           {
+               for (int x = 0; x < maxWallX; x++)
+               {
+                   for (int y = 0; y < maxWallY; y++)
+                   {
+                       Console.SetCursorPosition(x, y);
+
+                       if (wallBase[y][x] == 0)      // 벽
+                           Console.Write(wallSpace);
+                       else if (wallBase[y][x] == 2) // 박스
+                           Console.Write(movingBox);
+                       else if (wallBase[y][x] == 3) // 골대
+                           Console.Write(finishBox);
+                       else if (wallBase[y][x] == 4)
+                           Console.Write(BoxOnGoal);
+
+                       Console.Write(WallString);
+
+                       Console.SetCursorPosition(20, 1);
+                       Console.Write($"{BoxCnt}");
+                   }
+               }
+           }*/
         void makeWall()
         {
-            for (int x = 0; x < maxWallX; x++)
+            for (int y = 0; y < maxWallY; y++) // Y가 바깥 루프인 게 좌표 잡기 편합니다.
             {
-                for (int y = 0; y < maxWallY; y++)
+                for (int x = 0; x < maxWallX; x++)
                 {
                     Console.SetCursorPosition(x, y);
 
-                    if (wallBase[y][x] == 0)
+                    if (wallBase[y][x] == (int)ObjectType.SPACE)
                         Console.Write(wallSpace);
-                    else if (wallBase[y][x] == 2)
+                    else if (wallBase[y][x] == (int)ObjectType.STAR)
                         Console.Write(movingBox);
-                    else if (wallBase[y][x] == 3)
-                    {
+                    else if (wallBase[y][x] == (int)ObjectType.FINISH)
                         Console.Write(finishBox);
-                    }
-                    else if (wallBase[y][x] == 4)
-                    {
+                    else if (wallBase[y][x] == (int)ObjectType.LOOKSTAR)
                         Console.Write(BoxOnGoal);
-                    }
-                    Console.Write(WallString);
-
-                    Console.SetCursorPosition(20, 1);
-                    Console.Write($"{BoxCnt}");
+                    else if (wallBase[y][x] == (int)ObjectType.WALL) // else if로 변경
+                        Console.Write(WallString);
                 }
             }
+            // 점수는 루프 밖에서 한 번만 출력
+            Console.SetCursorPosition(20, 1);
+            Console.Write($"Remaining Boxes: {BoxCnt}  ");
         }
         // Box 수세기 
         int BoxCount()
@@ -175,189 +193,273 @@ namespace sokoban
                     break;
             }
         }
-
         // 박스가 골에 들어갔을시 // 박스가 박스와 닿았는지// 박스가 벽과 닿았는지
         void BoxMoveCheck(PlayerMoveNum pmc)
         {
+            if (pmc == PlayerMoveNum.STOP) return;
+
+            int dx = 0, dy = 0;
             switch (pmc)
             {
-                case PlayerMoveNum.UP:
-
-                    // 골대에 들어갔다면 
-                    if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
-                       wallBase[playerY - 2][playerX] == (int)ObjectType.FINISH)
-                    {
-                        wallBase[playerY - 1][playerX] = (int)ObjectType.SPACE;
-                        wallBase[playerY - 2][playerX] = (int)ObjectType.LOOKSTAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-                    }
-                    // 골대에서 나온다면 
-                    if (wallBase[playerY - 1][playerX] == (int)ObjectType.LOOKSTAR &&
-                        wallBase[playerY-2][playerX] != (int)ObjectType.WALL)
-                    {
-                        wallBase[playerY - 1][playerX] = (int)ObjectType.FINISH;
-                        wallBase[playerY - 2][playerX] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-                    }
-
-                    if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
-                       (wallBase[playerY - 2][playerX] == (int)ObjectType.STAR ||
-                        wallBase[playerY - 2][playerX] == (int)ObjectType.WALL ||
-                        wallBase[playerY - 2][playerX] == (int)ObjectType.LOOKSTAR)
-                        )
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
-
-                    }
-                    else if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR)
-                    {
-                        wallBase[playerY - 1][playerX] = (int)ObjectType.SPACE;
-                        wallBase[playerY - 2][playerX] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-                    }
-                    else
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-                    }
-
-
-
-                    break;
-                case PlayerMoveNum.DOWN:
-                    if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
-                       wallBase[playerY + 2][playerX] == (int)ObjectType.FINISH)
-                    {
-
-                        wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
-                        wallBase[playerY + 2][playerX] = (int)ObjectType.LOOKSTAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
-
-                        break;
-                    }
-
-                    // 골대에서 나온다면 
-                    if (wallBase[playerY + 1][playerX] == (int)ObjectType.LOOKSTAR &&
-                        wallBase[playerY+2][playerX] != (int)ObjectType.WALL)
-                    {
-                        wallBase[playerY + 1][playerX] = (int)ObjectType.FINISH;
-                        wallBase[playerY + 2][playerX] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
-                    }
-                    if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
-                       wallBase[playerY + 2][playerX] == (int)ObjectType.FINISH)
-                    {
-                        wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
-                        wallBase[playerY + 2][playerX] = (int)ObjectType.LOOKSTAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
-
-                        break;
-                    }
-                    if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
-                       (wallBase[playerY + 2][playerX] == (int)ObjectType.STAR ||
-                        wallBase[playerY + 2][playerX] == (int)ObjectType.WALL ||
-                        wallBase[playerY + 2][playerX] == (int)ObjectType.LOOKSTAR)
-                        )
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
-
-                    }
-                    else if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR)
-                    {
-                        wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
-                        wallBase[playerY + 2][playerX] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
-                    }
-                    else
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
-                    }
-                    break;
-
-                case PlayerMoveNum.RIGHT:
-
-                    if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
-                       wallBase[playerY][playerX + 2] == (int)ObjectType.FINISH)
-                    {
-
-                        wallBase[playerY][playerX + 1] = (int)ObjectType.SPACE;
-                        wallBase[playerY][playerX + 2] = (int)ObjectType.LOOKSTAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
-
-                        break;
-                    }
-
-                    // 골대에서 나온다면 
-                    if (wallBase[playerY][playerX+1] == (int)ObjectType.LOOKSTAR &&
-                        wallBase[playerY][playerX + 2] != (int)ObjectType.WALL)
-                    {
-                        wallBase[playerY][playerX+1] = (int)ObjectType.FINISH;
-                        wallBase[playerY][playerX+2] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
-                    }
-                    if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
-                       (wallBase[playerY][playerX + 2] == (int)ObjectType.STAR ||
-                        wallBase[playerY][playerX + 2] == (int)ObjectType.WALL ||
-                        wallBase[playerY][playerX + 2] == (int)ObjectType.LOOKSTAR)
-                        )
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
-
-                    }
-                    else if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR)
-                    {
-                        wallBase[playerY][playerX + 1] = (int)ObjectType.SPACE;
-                        wallBase[playerY][playerX + 2] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
-                    }
-                    else
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
-                    }
-                    break;
-                case PlayerMoveNum.LEFT:
-
-                    if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
-                       wallBase[playerY][playerX - 2] == (int)ObjectType.FINISH)
-                    {
-
-                        wallBase[playerY][playerX - 1] = (int)ObjectType.SPACE;
-                        wallBase[playerY][playerX - 2] = (int)ObjectType.LOOKSTAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
-
-                        break;
-                    }
-
-                    // 골대에서 나온다면 
-                    if (wallBase[playerY][playerX - 1] == (int)ObjectType.LOOKSTAR&&
-                        wallBase[playerY][playerX - 2] != (int)ObjectType.WALL)
-                    {
-                        wallBase[playerY][playerX - 1] = (int)ObjectType.FINISH;
-                        wallBase[playerY][playerX - 2] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
-                    }
-                    if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
-                       (wallBase[playerY][playerX - 2] == (int)ObjectType.STAR ||
-                        wallBase[playerY][playerX - 2] == (int)ObjectType.WALL ||
-                        wallBase[playerY][playerX - 2] == (int)ObjectType.LOOKSTAR)
-                        )
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
-
-                    }
-                    else if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR)
-                    {
-                        wallBase[playerY][playerX - 1] = (int)ObjectType.SPACE;
-                        wallBase[playerY][playerX - 2] = (int)ObjectType.STAR;
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
-                    }
-                    else
-                    {
-                        PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
-                    }
-                    break;
+                case PlayerMoveNum.UP: dy = -1; break;
+                case PlayerMoveNum.DOWN: dy = 1; break;
+                case PlayerMoveNum.LEFT: dx = -1; break;
+                case PlayerMoveNum.RIGHT: dx = 1; break;
             }
+
+            int nextX = playerX + dx;
+            int nextY = playerY + dy;
+            int postX = playerX + (dx * 2);
+            int postY = playerY + (dy * 2);
+
+            // --- 추가된 경계 검사 로직 ---
+            // 맵 밖으로 나가는 좌표인지 확인 (배열 인덱스 범위 체크)
+            if (nextX < 0 || nextY < 0 || nextX >= maxWallX || nextY >= maxWallY ||
+                postX < 0 || postY < 0 || postX >= maxWallX || postY >= maxWallY)
+            {
+                // 맵 밖으로는 이동할 수 없으므로 멈춤 처리
+                PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+                return;
+            }
+            // ----------------------------
+
+            ProcessMovement(nextX, nextY, postX, postY, pmc);
         }
 
+        void ProcessMovement(int nx, int ny, int px, int py, PlayerMoveNum pmc)
+        {
+            int nextTile = wallBase[ny][nx];
+            int postTile = wallBase[py][px];
+
+            // --- 1. 일반 박스(STAR)를 밀 때 ---
+            if (nextTile == (int)ObjectType.STAR)
+            {
+                if (postTile == (int)ObjectType.FINISH) // 골대로 이동
+                    UpdateMap(nx, ny, (int)ObjectType.SPACE, px, py, (int)ObjectType.LOOKSTAR, pmc);
+                else if (postTile == (int)ObjectType.SPACE) // 빈 공간으로 이동
+                    UpdateMap(nx, ny, (int)ObjectType.SPACE, px, py, (int)ObjectType.STAR, pmc);
+                else // 벽이나 다른 박스에 막힘
+                    PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+            }
+            // --- 2. 골대 안 박스(LOOKSTAR)를 밀 때 (이 부분이 핵심!) ---
+            else if (nextTile == (int)ObjectType.LOOKSTAR)
+            {
+                if (IsBlocking(postTile)) // 뒤에 벽이나 박스가 있으면 스탑!
+                {
+                    PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+                }
+                else if (postTile == (int)ObjectType.FINISH) // 골대에서 다음 골대로 이동
+                {
+                    UpdateMap(nx, ny, (int)ObjectType.FINISH, px, py, (int)ObjectType.LOOKSTAR, pmc);
+                }
+                else // 골대에서 빈 공간으로 이동
+                {
+                    UpdateMap(nx, ny, (int)ObjectType.FINISH, px, py, (int)ObjectType.STAR, pmc);
+                }
+            }
+            // --- 3. 아무것도 없을 때 (플레이어만 이동) ---
+            else
+            {
+                PlayerMoveCheck(playerX, playerY, pmc);
+            }
+        }
+        bool IsBlocking(int tile)
+        {
+            return tile == (int)ObjectType.WALL || tile == (int)ObjectType.STAR || tile == (int)ObjectType.LOOKSTAR;
+        }
+
+        void UpdateMap(int nx, int ny, int nType, int px, int py, int pType, PlayerMoveNum pmc)
+        {
+            wallBase[ny][nx] = nType;
+            wallBase[py][px] = pType;
+            PlayerMoveCheck(playerX, playerY, pmc);
+        }
+
+        /*    void BoxMoveCheck(PlayerMoveNum pmc)
+            {
+                switch (pmc)
+                {
+                    case PlayerMoveNum.UP:
+
+                        // 골대에 들어갔다면 
+                        if (WallbasePosition(playerX,playerY -1 , (int)ObjectType.STAR) &&
+                           wallBase[playerY - 2][playerX] == (int)ObjectType.FINISH)
+                        {
+                            wallBase[playerY - 1][playerX] = (int)ObjectType.SPACE;
+                            wallBase[playerY - 2][playerX] = (int)ObjectType.LOOKSTAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+                        }
+                        // 골대에서 나온다면 
+                        if (wallBase[playerY - 1][playerX] == (int)ObjectType.LOOKSTAR &&
+                            wallBase[playerY-2][playerX] != (int)ObjectType.WALL)
+                        {
+                            wallBase[playerY - 1][playerX] = (int)ObjectType.FINISH;
+                            wallBase[playerY - 2][playerX] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+                        }
+
+                        if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR &&
+                           (wallBase[playerY - 2][playerX] == (int)ObjectType.STAR ||
+                            wallBase[playerY - 2][playerX] == (int)ObjectType.WALL ||
+                            wallBase[playerY - 2][playerX] == (int)ObjectType.LOOKSTAR)
+                            )
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+
+                        }
+                        else if (wallBase[playerY - 1][playerX] == (int)ObjectType.STAR)
+                        {
+                            wallBase[playerY - 1][playerX] = (int)ObjectType.SPACE;
+                            wallBase[playerY - 2][playerX] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+                        }
+                        else
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+                        }
+
+
+
+                        break;
+                    case PlayerMoveNum.DOWN:
+                        if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
+                           wallBase[playerY + 2][playerX] == (int)ObjectType.FINISH)
+                        {
+
+                            wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
+                            wallBase[playerY + 2][playerX] = (int)ObjectType.LOOKSTAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
+
+                            break;
+                        }
+
+                        // 골대에서 나온다면 
+                        if (wallBase[playerY + 1][playerX] == (int)ObjectType.LOOKSTAR &&
+                            wallBase[playerY+2][playerX] != (int)ObjectType.WALL)
+                        {
+                            wallBase[playerY + 1][playerX] = (int)ObjectType.FINISH;
+                            wallBase[playerY + 2][playerX] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
+                        }
+                        if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
+                           wallBase[playerY + 2][playerX] == (int)ObjectType.FINISH)
+                        {
+                            wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
+                            wallBase[playerY + 2][playerX] = (int)ObjectType.LOOKSTAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.UP);
+
+                            break;
+                        }
+                        if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR &&
+                           (wallBase[playerY + 2][playerX] == (int)ObjectType.STAR ||
+                            wallBase[playerY + 2][playerX] == (int)ObjectType.WALL ||
+                            wallBase[playerY + 2][playerX] == (int)ObjectType.LOOKSTAR)
+                            )
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+
+                        }
+                        else if (wallBase[playerY + 1][playerX] == (int)ObjectType.STAR)
+                        {
+                            wallBase[playerY + 1][playerX] = (int)ObjectType.SPACE;
+                            wallBase[playerY + 2][playerX] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
+                        }
+                        else
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.DOWN);
+                        }
+                        break;
+
+                    case PlayerMoveNum.RIGHT:
+
+                        if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
+                           wallBase[playerY][playerX + 2] == (int)ObjectType.FINISH)
+                        {
+
+                            wallBase[playerY][playerX + 1] = (int)ObjectType.SPACE;
+                            wallBase[playerY][playerX + 2] = (int)ObjectType.LOOKSTAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
+
+                            break;
+                        }
+
+                        // 골대에서 나온다면 
+                        if (wallBase[playerY][playerX+1] == (int)ObjectType.LOOKSTAR &&
+                            wallBase[playerY][playerX + 2] != (int)ObjectType.WALL)
+                        {
+                            wallBase[playerY][playerX+1] = (int)ObjectType.FINISH;
+                            wallBase[playerY][playerX+2] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
+                        }
+                        if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR &&
+                           (wallBase[playerY][playerX + 2] == (int)ObjectType.STAR ||
+                            wallBase[playerY][playerX + 2] == (int)ObjectType.WALL ||
+                            wallBase[playerY][playerX + 2] == (int)ObjectType.LOOKSTAR)
+                            )
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+
+                        }
+                        else if (wallBase[playerY][playerX + 1] == (int)ObjectType.STAR)
+                        {
+                            wallBase[playerY][playerX + 1] = (int)ObjectType.SPACE;
+                            wallBase[playerY][playerX + 2] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
+                        }
+                        else
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.RIGHT);
+                        }
+                        break;
+                    case PlayerMoveNum.LEFT:
+
+                        if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
+                           wallBase[playerY][playerX - 2] == (int)ObjectType.FINISH)
+                        {
+
+                            wallBase[playerY][playerX - 1] = (int)ObjectType.SPACE;
+                            wallBase[playerY][playerX - 2] = (int)ObjectType.LOOKSTAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
+
+                            break;
+                        }
+
+                        // 골대에서 나온다면 
+                        if (wallBase[playerY][playerX - 1] == (int)ObjectType.LOOKSTAR&&
+                            wallBase[playerY][playerX - 2] != (int)ObjectType.WALL)
+                        {
+                            wallBase[playerY][playerX - 1] = (int)ObjectType.FINISH;
+                            wallBase[playerY][playerX - 2] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
+                        }
+                        if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR &&
+                           (wallBase[playerY][playerX - 2] == (int)ObjectType.STAR ||
+                            wallBase[playerY][playerX - 2] == (int)ObjectType.WALL ||
+                            wallBase[playerY][playerX - 2] == (int)ObjectType.LOOKSTAR)
+                            )
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.STOP);
+
+                        }
+                        else if (wallBase[playerY][playerX - 1] == (int)ObjectType.STAR)
+                        {
+                            wallBase[playerY][playerX - 1] = (int)ObjectType.SPACE;
+                            wallBase[playerY][playerX - 2] = (int)ObjectType.STAR;
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
+                        }
+                        else
+                        {
+                            PlayerMoveCheck(playerX, playerY, PlayerMoveNum.LEFT);
+                        }
+                        break;
+                }
+            }*/
+
+        bool WallbasePosition(int playerX,int playerY,int type)
+        {
+            return wallBase[playerY][playerX] == type;
+        }
         // 창 클리어// 벽만들기 // 키 인풋 할당 
         void PlayerMove()
         {
@@ -404,7 +506,7 @@ namespace sokoban
     }
     internal class Program
     {
-        static void Main(string[] args)
+        static void main(string[] args)
         {
             
             SokoBanClass sbc = new SokoBanClass();
