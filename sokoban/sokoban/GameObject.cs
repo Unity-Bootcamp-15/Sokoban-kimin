@@ -16,12 +16,12 @@ namespace sokoban
 
         public int y => pos.y;
 
-        private GameObject(Position pos, string symbol)
+        public GameObject(Position pos, string symbol)
         {
             this.pos = pos;
             _symbol = symbol;
         }
-        private GameObject(Position pos)
+        public GameObject(Position pos)
         {
             this.pos = pos;
             _symbol = symbol;
